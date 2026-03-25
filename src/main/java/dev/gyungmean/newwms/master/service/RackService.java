@@ -30,12 +30,8 @@ public class RackService {
                 .storageId(req.getStorageId())
                 .status(req.getStatus())
                 .lugg(req.getLugg())
-                .sidePos(req.getSidePos())
-                .sideRack(req.getSideRack())
                 .groupId(req.getGroupId())
-                .rackSize(req.getRackSize())
                 .zoneCode(req.getZoneCode())
-                .flexibleOption(req.getFlexibleOption())
                 .build();
 
         return RackDto.from(rackRepository.save(rack));

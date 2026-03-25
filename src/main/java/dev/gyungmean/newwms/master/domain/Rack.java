@@ -47,39 +47,35 @@ public class Rack extends BaseEntity implements Persistable<String> {
     @Column(name = "zone_code", length = 2)
     private String zoneCode;
 
-    @Column(name = "flexible_option")
-    private Boolean flexibleOption;
+//    @Column(name = "flexible_option")
+//    private Boolean flexibleOption;
 
     @Builder
     public Rack(String rackNo, String storageId, RackStatus status, LuggageStatus lugg,
-                SidePosition sidePos, String sideRack, Integer groupId,
-                RackSize rackSize, String zoneCode, Boolean flexibleOption) {
+        Integer groupId, String zoneCode) {
         this.rackNo = rackNo;
         this.storageId = storageId;
         this.status = status;
         this.lugg = lugg;
-        this.sidePos = sidePos;
-        this.sideRack = sideRack;
-        this.groupId = groupId;
-        this.rackSize = rackSize;
+        this.sidePos = getAddress().deriveSidePosition();
+        this.sideRack = getAddress().derivePartnerRackNo();
+        this.groupId = groupId; //TODO: groupID 부여 구현
+        this.rackSize = getAddress().deriveRackSize();
         this.zoneCode = zoneCode;
-        this.flexibleOption = flexibleOption;
+//        this.flexibleOption = flexibleOption;
     }
 
     // ========== 도메인 메서드 (직접 구현하세요) ==========
 
     /**
-     * 랙이 사용 가능한 상태인지 판단
-     * 조건: status == AVAILABLE && lugg == EMPTY
+     * 랙이 사용 가능한 상태인지 판단 조건: status == AVAILABLE && lugg == EMPTY
      */
     public boolean isAvailable() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("isAvailable()을 구현하세요");
+        return ((status == RackStatus.AVAILABLE) && (lugg == LuggageStatus.EMPTY));
     }
 
     /**
-     * Double-Deep 내측 랙인지 판단
-     * 조건: sidePos == INNER
+     * Double-Deep 내측 랙인지 판단 조건: sidePos == INNER
      */
     public boolean isDoubleDeepInner() {
         // TODO: 구현하세요
@@ -95,9 +91,7 @@ public class Rack extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * 입고 시작: status → INGRESS
-     * 전제조건: isAvailable() == true
-     * 위반 시 IllegalStateException
+     * 입고 시작: status → INGRESS 전제조건: isAvailable() == true 위반 시 IllegalStateException
      */
     public void startIngress() {
         // TODO: 구현하세요
@@ -105,8 +99,7 @@ public class Rack extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * 입고 완료: status → AVAILABLE, lugg → LOADED
-     * 전제조건: status == INGRESS
+     * 입고 완료: status → AVAILABLE, lugg → LOADED 전제조건: status == INGRESS
      */
     public void completeIngress() {
         // TODO: 구현하세요
@@ -114,8 +107,7 @@ public class Rack extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * 출고 시작: status → OUTBOUND
-     * 전제조건: status == AVAILABLE && lugg == LOADED
+     * 출고 시작: status → OUTBOUND 전제조건: status == AVAILABLE && lugg == LOADED
      */
     public void startOutbound() {
         // TODO: 구현하세요
@@ -123,8 +115,7 @@ public class Rack extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * 출고 완료: status → AVAILABLE, lugg → EMPTY
-     * 전제조건: status == OUTBOUND
+     * 출고 완료: status → AVAILABLE, lugg → EMPTY 전제조건: status == OUTBOUND
      */
     public void completeOutbound() {
         // TODO: 구현하세요
@@ -132,8 +123,7 @@ public class Rack extends BaseEntity implements Persistable<String> {
     }
 
     /**
-     * Cell 모니터링 표시 코드 반환 (status + lugg 조합)
-     * 0=빈셀, 1=입고중, 2=출고중, 3=예약중, 4=적재, 5=이중입고, 6=공출고, 9=불가
+     * Cell 모니터링 표시 코드 반환 (status + lugg 조합) 0=빈셀, 1=입고중, 2=출고중, 3=예약중, 4=적재, 5=이중입고, 6=공출고, 9=불가
      */
     public int getCellDisplayCode() {
         // TODO: 구현하세요
