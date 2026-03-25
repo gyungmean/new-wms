@@ -7,7 +7,9 @@
       "Bash(find /c/Personal/new-wms/new-wms/docs -type f -name *.md)",
       "Bash(find /c/Users/G20250070/markdown -type f -name *.md)",
       "Bash(find /c/Users/G20250070/markdown -type f -name *Item* -o -name *LoadType* -o -name *load*)",
-      "Bash(JAVA_HOME=\"/c/Program Files/Eclipse Adoptium/jdk-17.0.17.10-hotspot\" ./gradlew test 2>&1)"
+      "Bash(JAVA_HOME=\"/c/Program Files/Eclipse Adoptium/jdk-17.0.17.10-hotspot\" ./gradlew test 2>&1)",
+      "Bash(find /c/Personal/new-wms/new-wms/src/main/java/dev/gyungmean/newwms -type f -name *.java)",
+      "Bash(find C:Personalnew-wmsnew-wmsdocs -name *.md -type f)"
     ]
   }
 }
