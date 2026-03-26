@@ -21,15 +21,5 @@ public class RackCreateReq {
     @NotNull
     private LuggageStatus lugg;
 
-    private SidePosition sidePos;
-
-    private String sideRack;
-
-    private Integer groupId;
-
-    private RackSize rackSize;
-
     private String zoneCode;
-
-    private Boolean flexibleOption;
 }

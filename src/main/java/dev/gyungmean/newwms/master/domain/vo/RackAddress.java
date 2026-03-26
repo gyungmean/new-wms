@@ -66,16 +66,16 @@ public class RackAddress {
      */
     public String derivePartnerRackNo() {
         if (this.z == 1) {
-            return toRackNo(this.x, 2, this.x, this.y);
+            return toRackNo(this.s, 2, this.x, this.y);
         }
         if (this.z == 2) {
-            return toRackNo(this.x, 1, this.x, this.y);
+            return toRackNo(this.s, 1, this.x, this.y);
         }
         if (this.z == 3) {
-            return toRackNo(this.x, 4, this.x, this.y);
+            return toRackNo(this.s, 4, this.x, this.y);
         }
         if (this.z == 4) {
-            return toRackNo(this.x, 3, this.x, this.y);
+            return toRackNo(this.s, 3, this.x, this.y);
         }
         throw new IllegalStateException("There is no side rack.");
     }
@@ -91,6 +91,21 @@ public class RackAddress {
             return RackSize.M;
         }
         throw new IllegalStateException("This is not in rack.");
+    }
+
+    /**
+     * 크레인 작업 그룹 ID 계산
+     * 같은 호기(s), 같은 높이(y), Double-Deep 쌍(z-pair), 인접 번지 쌍(x-pair)의 4개 랙이 1그룹
+     *
+     * 공식: (x_pair_index - 1) × 864 + (y - 1) × 48 + (s - 1) × 2 + z_pair_index
+     * - z_pair_index: z∈{1,2}→1, z∈{3,4}→2
+     * - x_pair_index: ceil(x/2) — (1,2)→1, (3,4)→2, ..., (55,56)→28
+     * - 864 = 48(호기24×z쌍2) × 18(단)
+     */
+    public int deriveGroupId() {
+        int zPairIndex = (z <= 2) ? 1 : 2;
+        int xPairIndex = (x + 1) / 2;
+        return (xPairIndex - 1) * 864 + (y - 1) * 48 + (s - 1) * 2 + zPairIndex;
     }
 
     /**

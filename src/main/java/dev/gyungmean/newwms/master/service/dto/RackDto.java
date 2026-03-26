@@ -17,7 +17,6 @@ public class RackDto {
     private Integer groupId;
     private String rackSize;
     private String zoneCode;
-    private Boolean flexibleOption;
     private int cellDisplayCode;
 
     public static RackDto from(Rack rack) {
@@ -31,7 +30,6 @@ public class RackDto {
                 .groupId(rack.getGroupId())
                 .rackSize(rack.getRackSize() != null ? rack.getRackSize().name() : null)
                 .zoneCode(rack.getZoneCode())
-                .flexibleOption(rack.getFlexibleOption())
                 .cellDisplayCode(rack.getCellDisplayCode())
                 .build();
     }

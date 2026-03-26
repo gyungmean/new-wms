@@ -52,15 +52,16 @@ public class Rack extends BaseEntity implements Persistable<String> {
 
     @Builder
     public Rack(String rackNo, String storageId, RackStatus status, LuggageStatus lugg,
-        Integer groupId, String zoneCode) {
+        String zoneCode) {
         this.rackNo = rackNo;
+        RackAddress address = getAddress();
         this.storageId = storageId;
         this.status = status;
         this.lugg = lugg;
-        this.sidePos = getAddress().deriveSidePosition();
-        this.sideRack = getAddress().derivePartnerRackNo();
-        this.groupId = groupId; //TODO: groupID 부여 구현
-        this.rackSize = getAddress().deriveRackSize();
+        this.sidePos = address.deriveSidePosition();
+        this.sideRack = address.derivePartnerRackNo();
+        this.groupId = address.deriveGroupId();
+        this.rackSize = address.deriveRackSize();
         this.zoneCode = zoneCode;
 //        this.flexibleOption = flexibleOption;
     }
@@ -78,58 +79,70 @@ public class Rack extends BaseEntity implements Persistable<String> {
      * Double-Deep 내측 랙인지 판단 조건: sidePos == INNER
      */
     public boolean isDoubleDeepInner() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("isDoubleDeepInner()를 구현하세요");
+        return this.sidePos == SidePosition.INNER;
     }
 
     /**
      * 파트너 랙 번호 반환 (Double-Deep 쌍)
      */
     public String getPartnerRackNo() {
-        // TODO: 구현하세요 (sideRack 반환)
-        throw new UnsupportedOperationException("getPartnerRackNo()를 구현하세요");
+        return this.sideRack;
     }
 
     /**
      * 입고 시작: status → INGRESS 전제조건: isAvailable() == true 위반 시 IllegalStateException
      */
     public void startIngress() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("startIngress()를 구현하세요");
+        if(!isAvailable()) {
+            throw new IllegalStateException("입고할 수 없는 상태의 랙입니다.");
+        }
+        this.status = RackStatus.INGRESS;
     }
 
     /**
      * 입고 완료: status → AVAILABLE, lugg → LOADED 전제조건: status == INGRESS
      */
     public void completeIngress() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("completeIngress()를 구현하세요");
+        if(this.status != RackStatus.INGRESS) {
+            throw new IllegalStateException("입고 중이지 않은 랙입니다.");
+        }
+        this.status = RackStatus.AVAILABLE;
+        this.lugg = LuggageStatus.LOADED;
     }
 
     /**
      * 출고 시작: status → OUTBOUND 전제조건: status == AVAILABLE && lugg == LOADED
      */
     public void startOutbound() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("startOutbound()를 구현하세요");
+        if(!isAvailable()) {
+            throw new IllegalStateException("출고할 수 없는 상태의 랙입니다.");
+        }
+        this.status = RackStatus.OUTBOUND;
     }
 
     /**
      * 출고 완료: status → AVAILABLE, lugg → EMPTY 전제조건: status == OUTBOUND
      */
     public void completeOutbound() {
-        // TODO: 구현하세요
-        throw new UnsupportedOperationException("completeOutbound()를 구현하세요");
+        if(this.status != RackStatus.OUTBOUND) {
+            throw new IllegalStateException("출고 중이지 않은 랙입니다.");
+        }
+        this.status = RackStatus.AVAILABLE;
+        this.lugg = LuggageStatus.EMPTY;
     }
 
     /**
-     * Cell 모니터링 표시 코드 반환 (status + lugg 조합) 0=빈셀, 1=입고중, 2=출고중, 3=예약중, 4=적재, 5=이중입고, 6=공출고, 9=불가
+     * Cell 모니터링 상태 반환 (status + lugg 조합)
+     */
+    public CellState getCellState() {
+        return CellState.of(this.status, this.lugg);
+    }
+
+    /**
+     * Cell 모니터링 표시 코드 반환
      */
     public int getCellDisplayCode() {
-        // TODO: 구현하세요
-        // 힌트: status가 AVAILABLE일 때 lugg에 따라 0(EMPTY) 또는 4(LOADED)
-        //       그 외에는 status의 code 값 반환
-        throw new UnsupportedOperationException("getCellDisplayCode()를 구현하세요");
+        return getCellState().getDisplayCode();
     }
 
     /**

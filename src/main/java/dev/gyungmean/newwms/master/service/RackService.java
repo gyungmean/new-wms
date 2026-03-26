@@ -30,7 +30,6 @@ public class RackService {
                 .storageId(req.getStorageId())
                 .status(req.getStatus())
                 .lugg(req.getLugg())
-                .groupId(req.getGroupId())
                 .zoneCode(req.getZoneCode())
                 .build();
 
