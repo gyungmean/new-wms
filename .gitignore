@@ -41,3 +41,6 @@ gradle.properties
 
 ### Docs ###
 docs/
+
+### H2 file DB ###
+data/
