@@ -23,9 +23,10 @@ public class RackController {
         return ApiResponse.ok(rackService.create(req));
     }
 
-    @GetMapping("/{rackNo}")
-    public ApiResponse<RackDto> findByRackNo(@PathVariable String rackNo) {
-        return ApiResponse.ok(rackService.findByRackNo(rackNo));
+    @GetMapping("/{storageId}/{rackNo}")
+    public ApiResponse<RackDto> findByRackNo(@PathVariable String storageId,
+                                              @PathVariable String rackNo) {
+        return ApiResponse.ok(rackService.findByRackNo(storageId, rackNo));
     }
 
     @GetMapping
@@ -33,14 +34,16 @@ public class RackController {
         return ApiResponse.ok(rackService.search(req));
     }
 
-    @DeleteMapping("/{rackNo}")
-    public ApiResponse<Void> delete(@PathVariable String rackNo) {
-        rackService.delete(rackNo);
+    @DeleteMapping("/{storageId}/{rackNo}")
+    public ApiResponse<Void> delete(@PathVariable String storageId,
+                                    @PathVariable String rackNo) {
+        rackService.delete(storageId, rackNo);
         return ApiResponse.ok(null);
     }
 
-    @GetMapping("/{rackNo}/partner")
-    public ApiResponse<RackDto> findPartner(@PathVariable String rackNo) {
-        return ApiResponse.ok(rackService.findPartner(rackNo));
+    @GetMapping("/{storageId}/{rackNo}/partner")
+    public ApiResponse<RackDto> findPartner(@PathVariable String storageId,
+                                             @PathVariable String rackNo) {
+        return ApiResponse.ok(rackService.findPartner(storageId, rackNo));
     }
 }

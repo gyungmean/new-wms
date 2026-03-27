@@ -13,6 +13,7 @@ public class RackCreateReq {
     @NotBlank
     private String rackNo;
 
+    @NotBlank
     private String storageId;
 
     @NotNull
