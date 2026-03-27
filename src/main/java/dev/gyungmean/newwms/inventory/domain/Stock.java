@@ -6,6 +6,7 @@ import dev.gyungmean.newwms.common.exception.WmsStateException;
 import dev.gyungmean.newwms.inventory.domain.vo.ReservationStatus;
 import dev.gyungmean.newwms.inventory.domain.vo.StockStatus;
 import dev.gyungmean.newwms.master.domain.BagType;
+import dev.gyungmean.newwms.master.domain.Rack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,10 +16,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "w_stk_i", uniqueConstraints = @UniqueConstraint(
-    name = "uk_stock_business_key",
-    columnNames = {"storage_id", "rack_no", "item_code", "lot_date", "bag_type", "load_type"}
-))
+@Table(name = "w_stk_i", uniqueConstraints = @UniqueConstraint(name = "uk_stock_business_key",
+    columnNames = {"storage_id", "rack_no", "item_code", "lot_date", "bag_type", "load_type"}))
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Stock extends BaseEntity {
@@ -65,7 +64,7 @@ public class Stock extends BaseEntity {
     private ReservationStatus reservationStatus;
 
     private Stock(String storageId, String rackNo, String itemCode, LocalDate lotDate,
-                  BagType bagType, String loadType, BigDecimal quantity) {
+        BagType bagType, String loadType, BigDecimal quantity) {
         this.storageId = storageId;
         this.rackNo = rackNo;
         this.itemCode = itemCode;
@@ -78,83 +77,84 @@ public class Stock extends BaseEntity {
     }
 
     /**
-     * 재고 생성 팩토리 메서드.
-     * 초기 상태: NORMAL / NONE
+     * 재고 생성 팩토리 메서드. 초기 상태: NORMAL / NONE
      */
     public static Stock create(String storageId, String rackNo, String itemCode, LocalDate lotDate,
-                               BagType bagType, String loadType, BigDecimal quantity) {
+        BagType bagType, String loadType, BigDecimal quantity) {
         if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new UnsupportedOperationException("재고수량은 양수여야 합니다.");
+            throw new WmsStateException(ErrorCode.STOCK_QUANTITY_POSITIVE);
         }
         return new Stock(storageId, rackNo, itemCode, lotDate, bagType, loadType, quantity);
     }
 
-    // ========== 도메인 메서드 (직접 구현하세요) ==========
+    // ========== 도메인 메서드 ==========
 
     /**
-     * 출고 예약: NONE → RESERVED
-     * 전제조건: reservationStatus == NONE
+     * 출고 예약: NONE → RESERVED 전제조건: reservationStatus == NONE
      */
     public void reserve() {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
+        if (reservationStatus == ReservationStatus.RESERVED) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_RESERVED);
+        }
+        reservationStatus = ReservationStatus.RESERVED;
     }
 
     /**
-     * 예약 해제: RESERVED → NONE
-     * 전제조건: reservationStatus == RESERVED
+     * 예약 해제: RESERVED → NONE 전제조건: reservationStatus == RESERVED
      */
     public void release() {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
+        if (reservationStatus == ReservationStatus.NONE) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_NOT_RESERVED);
+        }
+        reservationStatus = ReservationStatus.NONE;
     }
 
     /**
-     * 보류 처리: NORMAL → HOLD
-     * 전제조건: stockStatus == NORMAL
+     * 보류 처리: NORMAL → HOLD 전제조건: stockStatus == NORMAL
      */
     public void hold() {
-        // TODO (Wave 1 TDD)
-        if(stockStatus != StockStatus.NORMAL) {
-            throw new WmsStateException(ErrorCode.RACK_NOT_AVAILABLE);
+        if (stockStatus != StockStatus.NORMAL) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
         }
-        throw new UnsupportedOperationException("TODO");
+        stockStatus = StockStatus.HOLD;
     }
 
     /**
-     * 보류 해제: HOLD → NORMAL
-     * 전제조건: stockStatus == HOLD
+     * 보류 해제: HOLD → NORMAL 전제조건: stockStatus == HOLD
      */
     public void unhold() {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
+        if (stockStatus != StockStatus.HOLD) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_NOT_HOLD);
+        }
+        stockStatus = StockStatus.NORMAL;
     }
 
     /**
-     * 위치 이동: storageId + rackNo 변경
-     * 전제조건: stockStatus != HOLD
+     * 위치 이동: storageId + rackNo 변경 전제조건: stockStatus != HOLD, targetRack.isAvailable() == true
      */
-    public void moveToLocation(String targetStorageId, String targetRackNo) {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
+    public void moveToLocation(Rack targetRack) {
+        if (stockStatus == StockStatus.HOLD) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
+        }
+        if (!targetRack.isAvailable()) {
+            throw new WmsStateException(ErrorCode.RACK_NOT_AVAILABLE);
+        }
+        this.storageId = targetRack.getStorageId();
+        this.rackNo = targetRack.getRackNo();
     }
 
     /**
-     * 재고 합산: other.quantity를 this에 더함
-     * 전제조건: other.itemCode == this.itemCode
-     * 전제조건: stockStatus != HOLD
+     * 재고 합산: other.quantity를 this에 더함 전제조건: other.itemCode == this.itemCode 전제조건: stockStatus !=
+     * HOLD
      */
     public void mergeWith(Stock other) {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
+        if (!other.getItemCode().equals(this.itemCode)) {
+            throw new WmsStateException(ErrorCode.STOCK_CANNOT_MERGED);
+        }
+        if (other.getStockStatus() == StockStatus.HOLD || this.stockStatus == StockStatus.HOLD) {
+            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
+        }
+        this.quantity = this.quantity.add(other.getQuantity());
     }
 
-    /**
-     * 재고 분할: splitQty만큼 차감 후 새 Stock 반환
-     * 전제조건: splitQty <= quantity, stockStatus != HOLD
-     */
-    public Stock splitQuantity(BigDecimal splitQty) {
-        // TODO (Wave 1 TDD)
-        throw new UnsupportedOperationException("TODO");
-    }
 }

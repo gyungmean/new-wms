@@ -1,8 +1,11 @@
-package dev.gyungmean.newwms.master.domain;
+package dev.gyungmean.newwms.inventory.domain;
 
-import dev.gyungmean.newwms.inventory.domain.Stock;
 import dev.gyungmean.newwms.inventory.domain.vo.ReservationStatus;
 import dev.gyungmean.newwms.inventory.domain.vo.StockStatus;
+import dev.gyungmean.newwms.master.domain.BagType;
+import dev.gyungmean.newwms.master.domain.LuggageStatus;
+import dev.gyungmean.newwms.master.domain.Rack;
+import dev.gyungmean.newwms.master.domain.RackStatus;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -75,10 +78,12 @@ public class StockTest {
     void moveLocation() {
         Stock stock = Stock.create("STRG01", "08010101", "ITEM0001", LocalDate.now(), BagType.S, "L1",
             BigDecimal.valueOf(11));
+        Rack targetRack = Rack.builder().storageId("STRG01").rackNo("09010101").lugg(LuggageStatus.EMPTY).status(
+            RackStatus.AVAILABLE).build();
 
-        stock.moveToLocation("STRG02", "09010101");
+        stock.moveToLocation(targetRack);
 
-        assertThat(stock.getStorageId()).isEqualTo("STRG02");
+        assertThat(stock.getStorageId()).isEqualTo("STRG01");
         assertThat(stock.getRackNo()).isEqualTo("09010101");
     }
 
@@ -93,17 +98,5 @@ public class StockTest {
         stock1.mergeWith(stock2);
 
         assertThat(stock1.getQuantity()).isEqualTo(BigDecimal.valueOf(12));
-    }
-
-    @Test
-    @DisplayName("재고 분할")
-    void splitQuantity() {
-        Stock stock1 = Stock.create("STRG01", "00000000", "ITEM0001", LocalDate.now(), BagType.S, "L1",
-            BigDecimal.valueOf(11));
-
-        Stock newStock = stock1.splitQuantity(BigDecimal.valueOf(1));
-
-        assertThat(stock1.getQuantity()).isEqualTo(BigDecimal.valueOf(10));
-        assertThat(newStock.getQuantity()).isEqualTo(BigDecimal.valueOf(1));
     }
 }

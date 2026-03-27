@@ -7,7 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum StorageKind {
     A("자동창고"),
-    M("수동창고");
+    M("수동창고"),
+    W("대기장");
 
     private final String description;
 }

@@ -31,6 +31,11 @@ public final class ErrorCode {
 
     // Stock
     public static final String STOCK_QUANTITY_POSITIVE = "stock.quantity.must_be_positive";
+    public static final String STOCK_IS_RESERVED = "stock.state.reserved";
+    public static final String STOCK_IS_NOT_RESERVED = "stock.state.not_reserved";
+    public static final String STOCK_IS_HOLD = "stock.state.hold";
+    public static final String STOCK_IS_NOT_HOLD = "stock.state.not_hold";
+    public static final String STOCK_CANNOT_MERGED = "stock.can.not_merged";
 
     // Common
     public static final String INTERNAL_ERROR         = "error.internal";
