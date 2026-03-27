@@ -46,7 +46,8 @@ class RackRepositoryTest {
         rackRepository.save(createRack("01020101", "STRG01", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "01"));
         rackRepository.save(createRack("02010101", "STRG02", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "01"));
 
-        // TODO: findByStorageId("STRG01")로 조회 → 2건인지 검증
+        List<Rack> result = rackRepository.findByStorageId("STRG01");
+        assertThat(result).hasSize(2);
     }
 
     @Test
@@ -56,7 +57,8 @@ class RackRepositoryTest {
         rackRepository.save(createRack("01020101", "STRG01", RackStatus.INGRESS, LuggageStatus.EMPTY, "01"));
         rackRepository.save(createRack("02010101", "STRG01", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "01"));
 
-        // TODO: findByStatus(AVAILABLE)로 조회 → 2건, findByStatus(INGRESS) → 1건 검증
+        assertThat(rackRepository.findByStatus(RackStatus.AVAILABLE)).hasSize(2);
+        assertThat(rackRepository.findByStatus(RackStatus.INGRESS)).hasSize(1);
     }
 
     @Test
@@ -65,7 +67,7 @@ class RackRepositoryTest {
         rackRepository.save(createRack("01010101", "STRG01", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "01"));
         rackRepository.save(createRack("01020101", "STRG01", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "02"));
 
-        // TODO: findByZoneCode("01")로 조회 → 1건인지 검증
+        assertThat(rackRepository.findByZoneCode("01")).hasSize(1);
     }
 
     @Test
@@ -75,7 +77,8 @@ class RackRepositoryTest {
         rackRepository.save(createRack("01020101", "STRG01", RackStatus.INGRESS, LuggageStatus.EMPTY, "01"));
         rackRepository.save(createRack("02010101", "STRG02", RackStatus.AVAILABLE, LuggageStatus.EMPTY, "01"));
 
-        // TODO: findByStorageIdAndStatus("STRG01", AVAILABLE) → 1건인지 검증
+        List<Rack> result = rackRepository.findByStorageIdAndStatus("STRG01", RackStatus.AVAILABLE);
+        assertThat(result).hasSize(1);
     }
 
     @Test
@@ -85,7 +88,7 @@ class RackRepositoryTest {
 
         rackRepository.deleteById("01010101");
 
-        // TODO: findById로 조회 → isEmpty인지 검증
+        assertThat(rackRepository.findById("01010101")).isEmpty();
     }
 
     // ========== 헬퍼 메서드 ==========

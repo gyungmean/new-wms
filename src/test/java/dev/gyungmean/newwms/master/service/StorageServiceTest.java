@@ -40,8 +40,10 @@ class StorageServiceTest {
         given(storageRepository.existsById("STRG000001")).willReturn(false);
         given(storageRepository.save(any(Storage.class))).willAnswer(inv -> inv.getArgument(0));
 
-        // TODO: storageService.create(req) 호출 후 결과 검증
-        // TODO: verify(storageRepository).save(any(Storage.class))
+        StorageDto result = storageService.create(req);
+        assertThat(result.getStorageId()).isEqualTo("STRG000001");
+        assertThat(result.getStorageName()).isEqualTo("1호 자동창고");
+        verify(storageRepository).save(any(Storage.class));
     }
 
     @Test
@@ -51,7 +53,9 @@ class StorageServiceTest {
 
         given(storageRepository.existsById("STRG000001")).willReturn(true);
 
-        // TODO: create() 호출 시 IllegalArgumentException + "이미 존재하는" 메시지 검증
+        assertThatThrownBy(() -> storageService.create(req))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 존재하는");
     }
 
     // ========== findById ==========
@@ -67,7 +71,9 @@ class StorageServiceTest {
 
         given(storageRepository.findById("STRG000001")).willReturn(Optional.of(storage));
 
-        // TODO: findById 호출 후 storageId, storageName 검증
+        StorageDto result = storageService.findById("STRG000001");
+        assertThat(result.getStorageId()).isEqualTo("STRG000001");
+        assertThat(result.getStorageName()).isEqualTo("1호 자동창고");
     }
 
     @Test
@@ -75,7 +81,8 @@ class StorageServiceTest {
     void findById_notFound() {
         given(storageRepository.findById("NOTEXIST")).willReturn(Optional.empty());
 
-        // TODO: findById 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> storageService.findById("NOTEXIST"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== findAll ==========
@@ -90,7 +97,8 @@ class StorageServiceTest {
 
         given(storageRepository.findAll()).willReturn(storages);
 
-        // TODO: findAll() 호출 후 size가 2인지 검증
+        List<StorageDto> result = storageService.findAll();
+        assertThat(result).hasSize(2);
     }
 
     // ========== update ==========
@@ -107,7 +115,9 @@ class StorageServiceTest {
         StorageCreateReq req = createReq("STRG000001", StorageKind.M, "변경된 이름");
         given(storageRepository.findById("STRG000001")).willReturn(Optional.of(storage));
 
-        // TODO: update() 호출 후 storageKindCode, storageName 변경 검증
+        StorageDto result = storageService.update("STRG000001", req);
+        assertThat(result.getStorageKindCode()).isEqualTo("M");
+        assertThat(result.getStorageName()).isEqualTo("변경된 이름");
     }
 
     @Test
@@ -116,7 +126,8 @@ class StorageServiceTest {
         StorageCreateReq req = createReq("NOTEXIST", StorageKind.A, "없음");
         given(storageRepository.findById("NOTEXIST")).willReturn(Optional.empty());
 
-        // TODO: update() 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> storageService.update("NOTEXIST", req))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== delete ==========
@@ -126,7 +137,8 @@ class StorageServiceTest {
     void delete_success() {
         given(storageRepository.existsById("STRG000001")).willReturn(true);
 
-        // TODO: delete() 호출 후 verify(storageRepository).deleteById("STRG000001")
+        storageService.delete("STRG000001");
+        verify(storageRepository).deleteById("STRG000001");
     }
 
     @Test
@@ -134,7 +146,8 @@ class StorageServiceTest {
     void delete_notFound() {
         given(storageRepository.existsById("NOTEXIST")).willReturn(false);
 
-        // TODO: delete() 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> storageService.delete("NOTEXIST"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== 헬퍼 메서드 ==========

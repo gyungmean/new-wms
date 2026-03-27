@@ -16,7 +16,9 @@ class StorageTest {
                 .storageName("1호 자동창고")
                 .build();
 
-        // TODO: storageId, storageKindCode, storageName 검증
+        assertThat(storage.getStorageId()).isEqualTo("STRG000001");
+        assertThat(storage.getStorageKindCode()).isEqualTo(StorageKind.A);
+        assertThat(storage.getStorageName()).isEqualTo("1호 자동창고");
     }
 
     @Test
@@ -30,7 +32,8 @@ class StorageTest {
 
         storage.update(StorageKind.M, "변경된 이름");
 
-        // TODO: storageKindCode가 M, storageName이 "변경된 이름"인지 검증
+        assertThat(storage.getStorageKindCode()).isEqualTo(StorageKind.M);
+        assertThat(storage.getStorageName()).isEqualTo("변경된 이름");
     }
 
     @Test
@@ -42,7 +45,7 @@ class StorageTest {
                 .storageName("테스트")
                 .build();
 
-        // TODO: isNew()가 true인지 검증
+        assertThat(storage.isNew()).isTrue();
     }
 
     @Test
@@ -53,12 +56,13 @@ class StorageTest {
                 .storageKindCode(StorageKind.A)
                 .build();
 
-        // TODO: getId()가 "STRG000001"인지 검증
+        assertThat(storage.getId()).isEqualTo("STRG000001");
     }
 
     @Test
     @DisplayName("StorageKind enum 값 확인")
     void storageKindValues() {
-        // TODO: StorageKind.A의 description이 "자동창고", M이 "수동창고"인지 검증
+        assertThat(StorageKind.A.getDescription()).isEqualTo("자동창고");
+        assertThat(StorageKind.M.getDescription()).isEqualTo("수동창고");
     }
 }

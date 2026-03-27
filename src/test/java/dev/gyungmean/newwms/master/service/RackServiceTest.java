@@ -40,8 +40,9 @@ class RackServiceTest {
         given(rackRepository.existsById("01010101")).willReturn(false);
         given(rackRepository.save(any(Rack.class))).willAnswer(inv -> inv.getArgument(0));
 
-        // TODO: rackService.create(req) 호출 후 rackNo 검증
-        // TODO: verify(rackRepository).save(any(Rack.class))
+        RackDto result = rackService.create(req);
+        assertThat(result.getRackNo()).isEqualTo("01010101");
+        verify(rackRepository).save(any(Rack.class));
     }
 
     @Test
@@ -51,7 +52,9 @@ class RackServiceTest {
 
         given(rackRepository.existsById("01010101")).willReturn(true);
 
-        // TODO: create() 호출 시 IllegalArgumentException + "이미 존재하는" 메시지 검증
+        assertThatThrownBy(() -> rackService.create(req))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 존재하는");
     }
 
     // ========== findByRackNo ==========
@@ -63,7 +66,8 @@ class RackServiceTest {
 
         given(rackRepository.findById("01010101")).willReturn(Optional.of(rack));
 
-        // TODO: findByRackNo 호출 후 rackNo 검증
+        RackDto result = rackService.findByRackNo("01010101");
+        assertThat(result.getRackNo()).isEqualTo("01010101");
     }
 
     @Test
@@ -71,7 +75,8 @@ class RackServiceTest {
     void findByRackNo_notFound() {
         given(rackRepository.findById("NOTEXIST")).willReturn(Optional.empty());
 
-        // TODO: findByRackNo 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> rackService.findByRackNo("NOTEXIST"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== search ==========
@@ -87,7 +92,8 @@ class RackServiceTest {
         req.setStorageId("STRG01");
         req.setStatus(RackStatus.AVAILABLE);
 
-        // TODO: search(req) 호출 후 결과 size가 1인지 검증
+        List<RackDto> result = rackService.search(req);
+        assertThat(result).hasSize(1);
     }
 
     @Test
@@ -100,7 +106,8 @@ class RackServiceTest {
         RackSearchReq req = new RackSearchReq();
         req.setStorageId("STRG01");
 
-        // TODO: search(req) 호출 후 결과 size가 2인지 검증
+        List<RackDto> result = rackService.search(req);
+        assertThat(result).hasSize(2);
     }
 
     @Test
@@ -110,7 +117,8 @@ class RackServiceTest {
 
         RackSearchReq req = new RackSearchReq();
 
-        // TODO: search(req) 호출 후 결과 size가 1인지 검증
+        List<RackDto> result = rackService.search(req);
+        assertThat(result).hasSize(1);
     }
 
     // ========== delete ==========
@@ -120,7 +128,8 @@ class RackServiceTest {
     void delete_success() {
         given(rackRepository.existsById("01010101")).willReturn(true);
 
-        // TODO: delete() 호출 후 verify(rackRepository).deleteById("01010101")
+        rackService.delete("01010101");
+        verify(rackRepository).deleteById("01010101");
     }
 
     @Test
@@ -128,7 +137,8 @@ class RackServiceTest {
     void delete_notFound() {
         given(rackRepository.existsById("NOTEXIST")).willReturn(false);
 
-        // TODO: delete() 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> rackService.delete("NOTEXIST"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     // ========== findPartner ==========
@@ -142,7 +152,8 @@ class RackServiceTest {
         given(rackRepository.findById("01010101")).willReturn(Optional.of(rack));
         given(rackRepository.findById("01020101")).willReturn(Optional.of(partner));
 
-        // TODO: findPartner("01010101") 호출 후 rackNo가 "01020101"인지 검증
+        RackDto result = rackService.findPartner("01010101");
+        assertThat(result.getRackNo()).isEqualTo("01020101");
     }
 
     @Test
@@ -150,7 +161,8 @@ class RackServiceTest {
     void findPartner_rackNotFound() {
         given(rackRepository.findById("NOTEXIST")).willReturn(Optional.empty());
 
-        // TODO: findPartner("NOTEXIST") 호출 시 IllegalArgumentException 검증
+        assertThatThrownBy(() -> rackService.findPartner("NOTEXIST"))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -161,7 +173,9 @@ class RackServiceTest {
         given(rackRepository.findById("01010101")).willReturn(Optional.of(rack));
         given(rackRepository.findById("01020101")).willReturn(Optional.empty());
 
-        // TODO: findPartner("01010101") 호출 시 IllegalArgumentException + "파트너 랙을 찾을 수 없습니다" 검증
+        assertThatThrownBy(() -> rackService.findPartner("01010101"))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("파트너 랙을 찾을 수 없습니다");
     }
 
     // ========== 헬퍼 메서드 ==========

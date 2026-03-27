@@ -33,7 +33,9 @@ class StorageRepositoryTest {
 
         storageRepository.save(storage);
 
-        // TODO: findById로 조회 후 isPresent, storageName 검증
+        Optional<Storage> found = storageRepository.findById("STRG000001");
+        assertThat(found).isPresent();
+        assertThat(found.get().getStorageName()).isEqualTo("1호 자동창고");
     }
 
     @Test
@@ -43,7 +45,8 @@ class StorageRepositoryTest {
         storageRepository.save(createStorage("STRG000002", StorageKind.M, "수동창고1"));
         storageRepository.save(createStorage("STRG000003", StorageKind.A, "자동창고2"));
 
-        // TODO: findByStorageKindCode(StorageKind.A)로 조회 → 2건인지 검증
+        List<Storage> result = storageRepository.findByStorageKindCode(StorageKind.A);
+        assertThat(result).hasSize(2);
     }
 
     @Test
@@ -53,13 +56,13 @@ class StorageRepositoryTest {
 
         storageRepository.deleteById("STRG000001");
 
-        // TODO: findById로 조회 → isEmpty인지 검증
+        assertThat(storageRepository.findById("STRG000001")).isEmpty();
     }
 
     @Test
     @DisplayName("존재하지 않는 ID 조회 시 empty")
     void findById_notFound() {
-        // TODO: findById("NOTEXIST")가 empty인지 검증
+        assertThat(storageRepository.findById("NOTEXIST")).isEmpty();
     }
 
     // ========== 헬퍼 메서드 ==========

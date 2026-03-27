@@ -16,20 +16,13 @@ class RackTest {
         Rack rack = createRack("08010301", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
         assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getStorageId()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-        assertThat(rack.getRackNo()).isEqualTo("08010301");
-
-        // TODO: rackNo, storageId, status, lugg 기본 필드 검증
-        // TODO: sidePos가 INNER인지 (z=1)
-        // TODO: sideRack이 "08020301"인지 (z 뒤집힘)
-        // TODO: groupId가 자동 계산되었는지 (null이 아님)
-        // TODO: rackSize가 H인지 (y=1)
+        assertThat(rack.getStorageId()).isEqualTo("STRG000001");
+        assertThat(rack.getStatus()).isEqualTo(RackStatus.AVAILABLE);
+        assertThat(rack.getLugg()).isEqualTo(LuggageStatus.EMPTY);
+        assertThat(rack.getSidePos()).isEqualTo(SidePosition.INNER);
+        assertThat(rack.getSideRack()).isEqualTo("08020301");
+        assertThat(rack.getGroupId()).isNotNull();
+        assertThat(rack.getRackSize()).isEqualTo(RackSize.H);
     }
 
     // ========== isAvailable ==========
@@ -39,7 +32,7 @@ class RackTest {
     void isAvailable_true() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: isAvailable()이 true인지 검증
+        assertThat(rack.isAvailable()).isTrue();
     }
 
     @Test
@@ -47,7 +40,7 @@ class RackTest {
     void isAvailable_loadedIsFalse() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.LOADED);
 
-        // TODO: isAvailable()이 false인지 검증
+        assertThat(rack.isAvailable()).isFalse();
     }
 
     @Test
@@ -55,7 +48,7 @@ class RackTest {
     void isAvailable_ingressIsFalse() {
         Rack rack = createRack("01010101", RackStatus.INGRESS, LuggageStatus.EMPTY);
 
-        // TODO: isAvailable()이 false인지 검증
+        assertThat(rack.isAvailable()).isFalse();
     }
 
     // ========== isDoubleDeepInner ==========
@@ -65,7 +58,7 @@ class RackTest {
     void isDoubleDeepInner_z1() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: isDoubleDeepInner()가 true인지 검증
+        assertThat(rack.isDoubleDeepInner()).isTrue();
     }
 
     @Test
@@ -73,7 +66,7 @@ class RackTest {
     void isDoubleDeepInner_z2() {
         Rack rack = createRack("01020101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: isDoubleDeepInner()가 false인지 검증
+        assertThat(rack.isDoubleDeepInner()).isFalse();
     }
 
     // ========== 상태 전이: 입고 ==========
@@ -85,7 +78,7 @@ class RackTest {
 
         rack.startIngress();
 
-        // TODO: status가 INGRESS인지 검증
+        assertThat(rack.getStatus()).isEqualTo(RackStatus.INGRESS);
     }
 
     @Test
@@ -93,7 +86,8 @@ class RackTest {
     void startIngress_fail() {
         Rack rack = createRack("01010101", RackStatus.INGRESS, LuggageStatus.EMPTY);
 
-        // TODO: startIngress() 호출 시 IllegalStateException 검증
+        assertThatThrownBy(rack::startIngress)
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -104,7 +98,8 @@ class RackTest {
 
         rack.completeIngress();
 
-        // TODO: status가 AVAILABLE, lugg가 LOADED인지 검증
+        assertThat(rack.getStatus()).isEqualTo(RackStatus.AVAILABLE);
+        assertThat(rack.getLugg()).isEqualTo(LuggageStatus.LOADED);
     }
 
     @Test
@@ -112,7 +107,8 @@ class RackTest {
     void completeIngress_fail() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: completeIngress() 호출 시 IllegalStateException 검증
+        assertThatThrownBy(rack::completeIngress)
+                .isInstanceOf(IllegalStateException.class);
     }
 
     // ========== 상태 전이: 출고 ==========
@@ -124,7 +120,7 @@ class RackTest {
 
         rack.startOutbound();
 
-        // TODO: status가 OUTBOUND인지 검증
+        assertThat(rack.getStatus()).isEqualTo(RackStatus.OUTBOUND);
     }
 
     @Test
@@ -132,7 +128,8 @@ class RackTest {
     void startOutbound_fail() {
         Rack rack = createRack("01010101", RackStatus.OUTBOUND, LuggageStatus.EMPTY);
 
-        // TODO: startOutbound() 호출 시 IllegalStateException 검증
+        assertThatThrownBy(rack::startOutbound)
+                .isInstanceOf(IllegalStateException.class);
     }
 
     @Test
@@ -143,7 +140,8 @@ class RackTest {
 
         rack.completeOutbound();
 
-        // TODO: status가 AVAILABLE, lugg가 EMPTY인지 검증
+        assertThat(rack.getStatus()).isEqualTo(RackStatus.AVAILABLE);
+        assertThat(rack.getLugg()).isEqualTo(LuggageStatus.EMPTY);
     }
 
     @Test
@@ -151,7 +149,8 @@ class RackTest {
     void completeOutbound_fail() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: completeOutbound() 호출 시 IllegalStateException 검증
+        assertThatThrownBy(rack::completeOutbound)
+                .isInstanceOf(IllegalStateException.class);
     }
 
     // ========== getCellState / getCellDisplayCode ==========
@@ -161,8 +160,8 @@ class RackTest {
     void cellState_empty() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: getCellState()가 CellState.EMPTY인지 검증
-        // TODO: getCellDisplayCode()가 0인지 검증
+        assertThat(rack.getCellState()).isEqualTo(CellState.EMPTY);
+        assertThat(rack.getCellDisplayCode()).isEqualTo(0);
     }
 
     @Test
@@ -170,8 +169,8 @@ class RackTest {
     void cellState_loaded() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.LOADED);
 
-        // TODO: getCellState()가 CellState.LOADED인지 검증
-        // TODO: getCellDisplayCode()가 4인지 검증
+        assertThat(rack.getCellState()).isEqualTo(CellState.LOADED);
+        assertThat(rack.getCellDisplayCode()).isEqualTo(4);
     }
 
     @Test
@@ -180,8 +179,8 @@ class RackTest {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
         rack.startIngress();
 
-        // TODO: getCellState()가 CellState.INGRESS인지 검증
-        // TODO: getCellDisplayCode()가 1인지 검증
+        assertThat(rack.getCellState()).isEqualTo(CellState.INGRESS);
+        assertThat(rack.getCellDisplayCode()).isEqualTo(1);
     }
 
     @Test
@@ -189,8 +188,8 @@ class RackTest {
     void cellState_unavailable() {
         Rack rack = createRack("01010101", RackStatus.UNAVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: getCellState()가 CellState.UNAVAILABLE인지 검증
-        // TODO: getCellDisplayCode()가 9인지 검증
+        assertThat(rack.getCellState()).isEqualTo(CellState.UNAVAILABLE);
+        assertThat(rack.getCellDisplayCode()).isEqualTo(9);
     }
 
     // ========== Persistable ==========
@@ -200,7 +199,7 @@ class RackTest {
     void isNew() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: isNew()가 true인지 검증
+        assertThat(rack.isNew()).isTrue();
     }
 
     @Test
@@ -208,7 +207,7 @@ class RackTest {
     void getId() {
         Rack rack = createRack("01010101", RackStatus.AVAILABLE, LuggageStatus.EMPTY);
 
-        // TODO: getId()가 "01010101"인지 검증
+        assertThat(rack.getId()).isEqualTo("01010101");
     }
 
     // ========== 헬퍼 메서드 ==========
