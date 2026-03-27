@@ -38,3 +38,6 @@ out/
 
 ### Local machine-specific settings ###
 gradle.properties
+
+### Docs ###
+docs/
