@@ -169,7 +169,6 @@ class RackAddressTest {
     void deriveGroupId_case1() {
         RackAddress addr = new RackAddress("01020101");
         assertThat(addr.deriveGroupId()).isEqualTo(1);
-        // TODO: deriveGroupId()가 1인지 검증
     }
 
     @Test
