@@ -52,12 +52,11 @@ public class HoldOrder extends BaseEntity {
     }
 
     public static HoldOrder create(Long stockId, String itemCode, String reason) {
-        // TODO (Wave 4 TDD)
-        throw new UnsupportedOperationException("TODO");
+        return new HoldOrder(stockId, itemCode, reason);
     }
 
     public void deactivate() {
-        // TODO (Wave 4 TDD)
-        throw new UnsupportedOperationException("TODO");
+        unholdAt = LocalDateTime.now();
+        this.active = false;
     }
 }
