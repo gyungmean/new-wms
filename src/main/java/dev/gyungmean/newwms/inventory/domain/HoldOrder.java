@@ -15,8 +15,9 @@ import java.time.LocalDateTime;
 public class HoldOrder extends BaseEntity {
 
     @Id
-    @Column(name = "hold_order_no", length = 20)
-    private String holdOrderNo;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "hold_order_id")
+    private Long id;
 
     /** 보류 대상 재고 ID (Stock.id) */
     @Column(name = "stock_id", nullable = false)
@@ -42,7 +43,15 @@ public class HoldOrder extends BaseEntity {
     @Column(name = "active", nullable = false)
     private boolean active;
 
-    public static HoldOrder create(String holdOrderNo, Long stockId, String itemCode, String reason) {
+    private HoldOrder(Long stockId, String itemCode, String reason) {
+        this.stockId = stockId;
+        this.itemCode = itemCode;
+        this.reason = reason;
+        this.holdAt = LocalDateTime.now();
+        this.active = true;
+    }
+
+    public static HoldOrder create(Long stockId, String itemCode, String reason) {
         // TODO (Wave 4 TDD)
         throw new UnsupportedOperationException("TODO");
     }

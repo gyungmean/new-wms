@@ -47,7 +47,7 @@ public class InventoryService {
      * @throws IllegalStateException    이미 보류 상태일 경우
      */
     @Transactional
-    public HoldOrder hold(Long stockId, String holdOrderNo, String reason) {
+    public HoldOrder hold(Long stockId, String reason) {
         // TODO (Wave 6 TDD)
         throw new UnsupportedOperationException("TODO");
     }
