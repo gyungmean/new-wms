@@ -30,7 +30,11 @@ public class FifoCandidateSelector {
         List<FifoAllocation> allocations = new ArrayList<>();
         for(Stock stock : sortedStocks) {
             if(sumQty.compareTo(stock.getQuantity()) < 0){
-                allocations.add(new FifoAllocation(stock, stock.getQuantity()));
+                BigDecimal quantity = stock.getQuantity();
+                if(requestedQty.subtract(sumQty).compareTo(quantity) < 0) {
+                    quantity = requestedQty.subtract(sumQty);
+                }
+                allocations.add(new FifoAllocation(stock,quantity));
                 sumQty = sumQty.add(stock.getQuantity());
             }
         }
