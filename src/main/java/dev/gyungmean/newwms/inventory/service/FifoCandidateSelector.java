@@ -1,9 +1,12 @@
 package dev.gyungmean.newwms.inventory.service;
 
+import dev.gyungmean.newwms.common.exception.ErrorCode;
+import dev.gyungmean.newwms.common.exception.WmsException;
 import dev.gyungmean.newwms.inventory.domain.Stock;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +15,7 @@ import java.util.List;
  */
 @Component
 public class FifoCandidateSelector {
+
 
     /**
      * FIFO 방식으로 요청 수량을 충족하는 재고 선택.
@@ -22,8 +26,18 @@ public class FifoCandidateSelector {
      * @throws IllegalStateException 총 재고 수량이 요청 수량에 미달할 경우
      */
     public FifoSelection select(List<Stock> sortedStocks, BigDecimal requestedQty) {
-        // TODO: running-sum 루프 구현 (Wave 5 TDD)
-        throw new UnsupportedOperationException("TODO");
+        BigDecimal sumQty = new BigDecimal(0);
+        List<FifoAllocation> allocations = new ArrayList<>();
+        for(Stock stock : sortedStocks) {
+            if(sumQty.compareTo(stock.getQuantity()) < 0){
+                allocations.add(new FifoAllocation(stock, stock.getQuantity()));
+                sumQty = sumQty.add(stock.getQuantity());
+            }
+        }
+        if(sumQty.compareTo(requestedQty) < 0) {
+            throw new WmsException(ErrorCode.STOCK_QTY_IS_NOT_ENOUGH);
+        }
+        return new FifoSelection(allocations);
     }
 
     // ========== 결과 타입 ==========

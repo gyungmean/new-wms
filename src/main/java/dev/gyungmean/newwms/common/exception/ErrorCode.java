@@ -37,6 +37,8 @@ public final class ErrorCode {
     public static final String STOCK_IS_NOT_HOLD = "stock.state.not_hold";
     public static final String STOCK_CANNOT_MERGED = "stock.can.not_merged";
 
+    public static final String STOCK_QTY_IS_NOT_ENOUGH = "stock.qty.is.not.enough";
+
     // Common
     public static final String INTERNAL_ERROR         = "error.internal";
 }
