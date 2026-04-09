@@ -2,7 +2,7 @@ package dev.gyungmean.newwms.inventory.domain;
 
 import dev.gyungmean.newwms.common.domain.BaseEntity;
 import dev.gyungmean.newwms.common.exception.ErrorCode;
-import dev.gyungmean.newwms.common.exception.WmsStateException;
+import dev.gyungmean.newwms.common.exception.WmsException;
 import dev.gyungmean.newwms.inventory.domain.vo.ReservationStatus;
 import dev.gyungmean.newwms.inventory.domain.vo.StockStatus;
 import dev.gyungmean.newwms.master.domain.BagType;
@@ -82,7 +82,7 @@ public class Stock extends BaseEntity {
     public static Stock create(String storageId, String rackNo, String itemCode, LocalDate lotDate,
         BagType bagType, String loadType, BigDecimal quantity) {
         if (quantity.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new WmsStateException(ErrorCode.STOCK_QUANTITY_POSITIVE);
+            throw new WmsException(ErrorCode.STOCK_QUANTITY_POSITIVE);
         }
         return new Stock(storageId, rackNo, itemCode, lotDate, bagType, loadType, quantity);
     }
@@ -94,7 +94,7 @@ public class Stock extends BaseEntity {
      */
     public void reserve() {
         if (reservationStatus == ReservationStatus.RESERVED) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_RESERVED);
+            throw new WmsException(ErrorCode.STOCK_IS_RESERVED);
         }
         reservationStatus = ReservationStatus.RESERVED;
     }
@@ -104,7 +104,7 @@ public class Stock extends BaseEntity {
      */
     public void release() {
         if (reservationStatus == ReservationStatus.NONE) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_NOT_RESERVED);
+            throw new WmsException(ErrorCode.STOCK_IS_NOT_RESERVED);
         }
         reservationStatus = ReservationStatus.NONE;
     }
@@ -114,7 +114,7 @@ public class Stock extends BaseEntity {
      */
     public void hold() {
         if (stockStatus != StockStatus.NORMAL) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
+            throw new WmsException(ErrorCode.STOCK_IS_HOLD);
         }
         stockStatus = StockStatus.HOLD;
     }
@@ -124,7 +124,7 @@ public class Stock extends BaseEntity {
      */
     public void unhold() {
         if (stockStatus != StockStatus.HOLD) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_NOT_HOLD);
+            throw new WmsException(ErrorCode.STOCK_IS_NOT_HOLD);
         }
         stockStatus = StockStatus.NORMAL;
     }
@@ -134,10 +134,10 @@ public class Stock extends BaseEntity {
      */
     public void moveToLocation(Rack targetRack) {
         if (stockStatus == StockStatus.HOLD) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
+            throw new WmsException(ErrorCode.STOCK_IS_HOLD);
         }
         if (!targetRack.isAvailable()) {
-            throw new WmsStateException(ErrorCode.RACK_NOT_AVAILABLE);
+            throw new WmsException(ErrorCode.RACK_NOT_AVAILABLE);
         }
         this.storageId = targetRack.getStorageId();
         this.rackNo = targetRack.getRackNo();
@@ -150,7 +150,7 @@ public class Stock extends BaseEntity {
     public void adjustQuantity(BigDecimal delta) {
         BigDecimal newQty = this.quantity.add(delta);
         if (newQty.compareTo(BigDecimal.ZERO) < 0) {
-            throw new WmsStateException(ErrorCode.STOCK_QUANTITY_POSITIVE);
+            throw new WmsException(ErrorCode.STOCK_QUANTITY_POSITIVE);
         }
         this.quantity = newQty;
     }
@@ -161,10 +161,10 @@ public class Stock extends BaseEntity {
      */
     public void mergeWith(Stock other) {
         if (!other.getItemCode().equals(this.itemCode)) {
-            throw new WmsStateException(ErrorCode.STOCK_CANNOT_MERGED);
+            throw new WmsException(ErrorCode.STOCK_CANNOT_MERGED);
         }
         if (other.getStockStatus() == StockStatus.HOLD || this.stockStatus == StockStatus.HOLD) {
-            throw new WmsStateException(ErrorCode.STOCK_IS_HOLD);
+            throw new WmsException(ErrorCode.STOCK_IS_HOLD);
         }
         this.quantity = this.quantity.add(other.getQuantity());
     }

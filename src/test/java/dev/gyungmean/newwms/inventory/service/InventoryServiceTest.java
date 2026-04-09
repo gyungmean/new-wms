@@ -18,7 +18,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import dev.gyungmean.newwms.common.exception.WmsStateException;
+import dev.gyungmean.newwms.common.exception.WmsException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -97,7 +97,7 @@ class InventoryServiceTest {
         given(stockRepository.findById(1L)).willReturn(Optional.of(stock));
 
         assertThatThrownBy(() -> inventoryService.hold(1L, "중복 보류"))
-                .isInstanceOf(WmsStateException.class);
+                .isInstanceOf(WmsException.class);
     }
 
     // ========== unhold ==========
@@ -160,7 +160,7 @@ class InventoryServiceTest {
         given(stockRepository.findById(1L)).willReturn(Optional.of(stock));
 
         assertThatThrownBy(() -> inventoryService.adjust(1L, BigDecimal.valueOf(-50)))
-                .isInstanceOf(WmsStateException.class);
+                .isInstanceOf(WmsException.class);
     }
 
     // ========== getFifoCandidates ==========
