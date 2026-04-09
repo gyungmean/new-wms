@@ -144,6 +144,18 @@ public class Stock extends BaseEntity {
     }
 
     /**
+     * 재고 수량 조정 (증가/감소).
+     * 전제조건: 조정 후 수량이 0 이상
+     */
+    public void adjustQuantity(BigDecimal delta) {
+        BigDecimal newQty = this.quantity.add(delta);
+        if (newQty.compareTo(BigDecimal.ZERO) < 0) {
+            throw new WmsStateException(ErrorCode.STOCK_QUANTITY_POSITIVE);
+        }
+        this.quantity = newQty;
+    }
+
+    /**
      * 재고 합산: other.quantity를 this에 더함 전제조건: other.itemCode == this.itemCode 전제조건: stockStatus !=
      * HOLD
      */

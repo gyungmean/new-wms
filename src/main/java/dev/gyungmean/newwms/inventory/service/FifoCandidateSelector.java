@@ -26,17 +26,14 @@ public class FifoCandidateSelector {
      * @throws IllegalStateException 총 재고 수량이 요청 수량에 미달할 경우
      */
     public FifoSelection select(List<Stock> sortedStocks, BigDecimal requestedQty) {
-        BigDecimal sumQty = new BigDecimal(0);
+        BigDecimal sumQty = BigDecimal.ZERO;
         List<FifoAllocation> allocations = new ArrayList<>();
-        for(Stock stock : sortedStocks) {
-            if(sumQty.compareTo(stock.getQuantity()) < 0){
-                BigDecimal quantity = stock.getQuantity();
-                if(requestedQty.subtract(sumQty).compareTo(quantity) < 0) {
-                    quantity = requestedQty.subtract(sumQty);
-                }
-                allocations.add(new FifoAllocation(stock,quantity));
-                sumQty = sumQty.add(stock.getQuantity());
-            }
+        for (Stock stock : sortedStocks) {
+            if (sumQty.compareTo(requestedQty) >= 0) break;
+            BigDecimal remaining = requestedQty.subtract(sumQty);
+            BigDecimal allocQty = stock.getQuantity().min(remaining);
+            allocations.add(new FifoAllocation(stock, allocQty));
+            sumQty = sumQty.add(allocQty);
         }
         if(sumQty.compareTo(requestedQty) < 0) {
             throw new WmsException(ErrorCode.STOCK_QTY_IS_NOT_ENOUGH);

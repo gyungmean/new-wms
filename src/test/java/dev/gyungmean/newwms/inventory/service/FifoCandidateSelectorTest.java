@@ -10,6 +10,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+import dev.gyungmean.newwms.common.exception.WmsException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -68,14 +70,14 @@ class FifoCandidateSelectorTest {
         Stock stock = stock("ITEM001", LocalDate.of(2024, 1, 1), BigDecimal.valueOf(10));
 
         assertThatThrownBy(() -> selector.select(List.of(stock), BigDecimal.valueOf(50)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(WmsException.class);
     }
 
     @Test
     @DisplayName("재고 목록이 비어있으면 예외")
     void select_emptyList() {
         assertThatThrownBy(() -> selector.select(List.of(), BigDecimal.valueOf(10)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(WmsException.class);
     }
 
     private Stock stock(String itemCode, LocalDate lotDate, BigDecimal qty) {

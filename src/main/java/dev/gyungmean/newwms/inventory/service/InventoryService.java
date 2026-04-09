@@ -27,16 +27,15 @@ public class InventoryService {
      * @throws IllegalArgumentException 재고가 없을 경우
      */
     public Stock findStock(Long stockId) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        return stockRepository.findById(stockId)
+                .orElseThrow(() -> new IllegalArgumentException("재고를 찾을 수 없습니다: " + stockId));
     }
 
     /**
      * 품목 코드 기준 재고 전체 조회.
      */
     public List<Stock> findAllByItemCode(String itemCode) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        return stockRepository.findByItemCode(itemCode);
     }
 
     /**
@@ -48,8 +47,10 @@ public class InventoryService {
      */
     @Transactional
     public HoldOrder hold(Long stockId, String reason) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        Stock stock = findStock(stockId);
+        stock.hold();
+        HoldOrder holdOrder = HoldOrder.create(stockId, stock.getItemCode(), reason);
+        return holdOrderRepository.save(holdOrder);
     }
 
     /**
@@ -60,8 +61,11 @@ public class InventoryService {
      */
     @Transactional
     public void unhold(Long stockId) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        Stock stock = findStock(stockId);
+        HoldOrder holdOrder = holdOrderRepository.findByStockIdAndActiveTrue(stockId)
+                .orElseThrow(() -> new IllegalStateException("활성 보류 지시가 없습니다: " + stockId));
+        holdOrder.deactivate();
+        stock.unhold();
     }
 
     /**
@@ -71,8 +75,8 @@ public class InventoryService {
      */
     @Transactional
     public void adjust(Long stockId, BigDecimal delta) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        Stock stock = findStock(stockId);
+        stock.adjustQuantity(delta);
     }
 
     /**
@@ -80,7 +84,7 @@ public class InventoryService {
      * HOLD 상태 재고 제외 후 lotDate ASC 정렬, FifoCandidateSelector에 위임.
      */
     public FifoCandidateSelector.FifoSelection getFifoCandidates(String itemCode, BigDecimal requestedQty) {
-        // TODO (Wave 6 TDD)
-        throw new UnsupportedOperationException("TODO");
+        List<Stock> candidates = stockRepository.findByItemCodeAndStockStatusNotOrderByLotDateAsc(itemCode, StockStatus.HOLD);
+        return fifoCandidateSelector.select(candidates, requestedQty);
     }
 }

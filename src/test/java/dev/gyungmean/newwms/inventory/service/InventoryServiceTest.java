@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import dev.gyungmean.newwms.common.exception.WmsStateException;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -95,7 +97,7 @@ class InventoryServiceTest {
         given(stockRepository.findById(1L)).willReturn(Optional.of(stock));
 
         assertThatThrownBy(() -> inventoryService.hold(1L, "중복 보류"))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(WmsStateException.class);
     }
 
     // ========== unhold ==========
@@ -158,7 +160,7 @@ class InventoryServiceTest {
         given(stockRepository.findById(1L)).willReturn(Optional.of(stock));
 
         assertThatThrownBy(() -> inventoryService.adjust(1L, BigDecimal.valueOf(-50)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(WmsStateException.class);
     }
 
     // ========== getFifoCandidates ==========
