@@ -43,20 +43,32 @@ public class OutOrder extends BaseEntity {
 
     public static OutOrder create(String deliverOrdNo, Integer deliverOrdItem,
                                    Long stockId, BigDecimal allocatedQty) {
-        // TODO: 구현하세요
-        // 힌트: status 초기값은 READY
-        throw new UnsupportedOperationException("구현 필요");
+        OutOrder order = new OutOrder();
+        order.deliverOrdNo = deliverOrdNo;
+        order.deliverOrdItem = deliverOrdItem;
+        order.stockId = stockId;
+        order.allocatedQty = allocatedQty;
+        order.status = OutOrderStatus.READY;
+        return order;
     }
 
     public void complete() {
-        // TODO: 구현하세요
-        // 힌트: IN_PROGRESS 상태에서만 COMPLETED로 전이 가능
-        throw new UnsupportedOperationException("구현 필요");
+        if(this.status == OutOrderStatus.READY) {
+            throw new IllegalStateException("완료할 출고 작업이 진행되지 않았습니다.");
+        }
+        if(this.status == OutOrderStatus.COMPLETED) {
+            throw new IllegalStateException("이미 출고 작업이 완료 되었습니다.");
+        }
+        this.status = OutOrderStatus.COMPLETED;
     }
 
     public void start() {
-        // TODO: 구현하세요
-        // 힌트: READY 상태에서만 IN_PROGRESS로 전이 가능
-        throw new UnsupportedOperationException("구현 필요");
+        if(this.status == OutOrderStatus.IN_PROGRESS) {
+            throw new IllegalStateException("이미 출고 작업이 진행 중입니다.");
+        }
+        if(this.status == OutOrderStatus.COMPLETED) {
+            throw new IllegalStateException("이미 출고 작업이 완료 되었습니다.");
+        }
+        this.status = OutOrderStatus.IN_PROGRESS;
     }
 }
